@@ -32,8 +32,11 @@ export default async function MyListings() {
   }
 
   let items: Listing[] = [];
+  let isAdmin = false;
   try {
     const admin = getAdmin();
+    const { data: me } = await admin.from("profiles").select("role").eq("id", session.pid).maybeSingle();
+    isAdmin = me?.role === "admin";
     const { data } = await admin
       .from("listings")
       .select("*, districts(name_ru), listing_photos(url)")
@@ -49,7 +52,14 @@ export default async function MyListings() {
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b bg-white px-4 py-3">
         <Link href="/" className="text-2xl">←</Link>
         <b className="text-base">Мои объявления</b>
-        <span className="ml-auto text-sm text-slate-500">{session.phone.replace(/^998/, "+998 ")}</span>
+        {isAdmin && (
+          <Link href="/admin" className="ml-auto rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-700">
+            Модерация
+          </Link>
+        )}
+        <span className={`${isAdmin ? "" : "ml-auto"} text-sm text-slate-500`}>
+          {session.phone.replace(/^998/, "+998 ")}
+        </span>
         <LogoutButton />
       </div>
 

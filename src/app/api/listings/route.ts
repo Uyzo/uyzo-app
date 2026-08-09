@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         floor,
         district_id: dist?.id ?? null,
         owner_type: ownerType,
-        status: "active", // временно публикуем сразу; модерацию включим вместе с админ-панелью
+        status: "pending", // на модерацию: появится в ленте после одобрения админом
       })
       .select("id")
       .single();

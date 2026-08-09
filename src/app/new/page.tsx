@@ -68,12 +68,14 @@ export default function NewListing() {
   if (status === "done") {
     return (
       <main className="mx-auto max-w-2xl p-6 text-center">
-        <div className="mt-10 text-5xl">✅</div>
-        <h1 className="mt-4 text-2xl font-bold">Объявление опубликовано</h1>
-        <p className="mt-2 text-slate-600">Оно уже в ленте Uyzo. Спасибо!</p>
+        <div className="mt-10 text-5xl">🕒</div>
+        <h1 className="mt-4 text-2xl font-bold">Отправлено на модерацию</h1>
+        <p className="mt-2 text-slate-600">
+          Мы проверим объявление и опубликуем его в ленте. Статус видно в «Моих объявлениях».
+        </p>
         <div className="mt-6 flex justify-center gap-3">
-          <Link href={`/listing/${newId}`} className="rounded-xl bg-brand px-5 py-3 font-semibold text-white">
-            Открыть объявление
+          <Link href="/my" className="rounded-xl bg-brand px-5 py-3 font-semibold text-white">
+            Мои объявления
           </Link>
           <Link href="/" className="rounded-xl bg-brand-light px-5 py-3 font-semibold text-brand-dark">
             На главную
