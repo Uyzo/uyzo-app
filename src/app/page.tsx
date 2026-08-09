@@ -48,7 +48,13 @@ export default async function Home({
             </span>
             Uyzo
           </div>
-          <span className="ml-auto text-sm font-semibold text-slate-500">📍 Ташкент</span>
+          <Link
+            href="/new"
+            className="ml-auto rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white"
+          >
+            ＋ Разместить
+          </Link>
+          <span className="text-sm font-semibold text-slate-500">📍 Ташкент</span>
         </div>
         <div className="flex gap-2 overflow-x-auto px-4 pb-3">
           {TABS.map((t) => (
