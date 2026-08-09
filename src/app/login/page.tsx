@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Login() {
@@ -10,6 +10,31 @@ export default function Login() {
   const [dev, setDev] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [tgInit, setTgInit] = useState("");
+
+  useEffect(() => {
+    const tg = (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram?.WebApp;
+    if (tg?.initData) setTgInit(tg.initData);
+  }, []);
+
+  async function loginTelegram() {
+    setBusy(true);
+    setErr("");
+    try {
+      const res = await fetch("/api/auth/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tgInit }),
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error);
+      window.location.href = "/my";
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Ошибка");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const field = "w-full rounded-xl border border-slate-200 p-3 text-lg outline-none focus:border-brand";
 
@@ -67,6 +92,19 @@ export default function Login() {
       <p className="mb-6 text-sm text-slate-500">
         {step === "phone" ? "Введите номер телефона — пришлём код." : `Код отправлен на ${phone}`}
       </p>
+
+      {tgInit && (
+        <div className="mb-5">
+          <button
+            onClick={loginTelegram}
+            disabled={busy}
+            className="w-full rounded-xl bg-[#229ED9] p-4 text-base font-semibold text-white disabled:opacity-60"
+          >
+            ✈️ Войти через Telegram
+          </button>
+          <div className="my-3 text-center text-xs text-slate-400">или по номеру телефона</div>
+        </div>
+      )}
 
       {step === "phone" ? (
         <>
