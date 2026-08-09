@@ -6,7 +6,14 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabas
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY || "placeholder-key";
 
 export function getSupabase() {
-  return createClient(url, key, { auth: { persistSession: false } });
+  return createClient(url, key, {
+    auth: { persistSession: false },
+    // не кэшировать чтение — чтобы новые объявления сразу появлялись в ленте
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
+  });
 }
 
 // Типы под наши таблицы (упрощённо)

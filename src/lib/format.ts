@@ -1,6 +1,7 @@
 import type { Listing } from "./supabase";
 
 export function priceStr(l: Pick<Listing, "price" | "currency">): string {
+  if (!l.price || l.price <= 0) return "Цена договорная";
   const n = Math.round(l.price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   return l.currency === "USD" ? `$${n}` : `${n} сум`;
 }
