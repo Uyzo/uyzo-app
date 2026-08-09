@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdmin } from "@/lib/supabaseAdmin";
+import { getSession } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,13 +41,18 @@ export async function POST(req: Request) {
 
     const admin = getAdmin();
 
-    // Владелец: временно берём первый профиль (до входа по SMS)
-    const { data: prof } = await admin.from("profiles").select("id").limit(1).single();
-    if (!prof) {
-      return NextResponse.json(
-        { error: "В базе нет ни одного профиля. Запустите seed.sql в Supabase." },
-        { status: 400 }
-      );
+    // Владелец: вошедший пользователь; если не вошёл — первый профиль (демо)
+    const session = getSession();
+    let ownerId = session?.pid;
+    if (!ownerId) {
+      const { data: prof } = await admin.from("profiles").select("id").limit(1).single();
+      if (!prof) {
+        return NextResponse.json(
+          { error: "В базе нет ни одного профиля. Запустите seed.sql в Supabase." },
+          { status: 400 }
+        );
+      }
+      ownerId = prof.id;
     }
 
     const { data: cat } = categorySlug
@@ -65,7 +71,7 @@ export async function POST(req: Request) {
     const { data: inserted, error: insErr } = await admin
       .from("listings")
       .insert({
-        owner_id: prof.id,
+        owner_id: ownerId,
         kind,
         deal_type: kind === "realty" ? deal || "sale" : null,
         category_id: cat?.id ?? null,

@@ -31,6 +31,7 @@ export type Listing = {
   area: number | null;
   floor: string | null;
   owner_type: "owner" | "agent";
+  status?: string;
   seller_verified?: boolean;
   created_at: string;
   districts: { name_ru: string } | null;

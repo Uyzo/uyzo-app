@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSupabase, type Listing } from "@/lib/supabase";
+import { getSession } from "@/lib/session";
 import ListingCard from "./components/ListingCard";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,7 @@ export default async function Home({
   searchParams: { tab?: string };
 }) {
   const active = TABS.find((t) => t.key === searchParams.tab) ?? TABS[0];
+  const session = getSession();
 
   let listings: Listing[] = [];
   let error: string | null = null;
@@ -54,7 +56,13 @@ export default async function Home({
           >
             ＋ Разместить
           </Link>
-          <span className="text-sm font-semibold text-slate-500">📍 Ташкент</span>
+          <Link
+            href={session ? "/my" : "/login"}
+            className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700"
+          >
+            {session ? "👤 Мои" : "Войти"}
+          </Link>
+          <span className="hidden text-sm font-semibold text-slate-500 sm:inline">📍 Ташкент</span>
         </div>
         <div className="flex gap-2 overflow-x-auto px-4 pb-3">
           {TABS.map((t) => (
