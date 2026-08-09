@@ -2,106 +2,133 @@ import Link from "next/link";
 import { getSupabase, type Listing } from "@/lib/supabase";
 import { getSession } from "@/lib/session";
 import ListingCard from "./components/ListingCard";
+import FilterBar from "./components/FilterBar";
 
 export const dynamic = "force-dynamic";
 
+const RATE = 12700;
+
 const TABS = [
-  { key: "sale", label: "🏷️ Купить", kind: "realty", deal: "sale" },
-  { key: "rent", label: "🔑 Снять", kind: "realty", deal: "rent" },
-  { key: "goods", label: "🛒 Объявления", kind: "goods", deal: null },
-  { key: "service", label: "🛠️ Мастера", kind: "service", deal: null },
+  { key: "sale", label: "Купить", kind: "realty", deal: "sale" },
+  { key: "rent", label: "Снять", kind: "realty", deal: "rent" },
+  { key: "goods", label: "Объявления", kind: "goods", deal: null },
+  { key: "service", label: "Мастера", kind: "service", deal: null },
 ];
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: { tab?: string };
-}) {
+type SP = {
+  tab?: string; q?: string; cur?: string; pmin?: string; pmax?: string;
+  district?: string; rooms?: string; owner?: string;
+};
+
+export default async function Home({ searchParams }: { searchParams: SP }) {
   const active = TABS.find((t) => t.key === searchParams.tab) ?? TABS[0];
+  const realty = active.kind === "realty";
   const session = getSession();
+  const cur = searchParams.cur === "USD" ? "USD" : "UZS";
+  const q = (searchParams.q ?? "").replace(/[(),]/g, " ").trim();
 
   let listings: Listing[] = [];
   let error: string | null = null;
   try {
     const supabase = getSupabase();
-    let q = supabase
-      .from("listings")
-      .select("*, districts(name_ru), listing_photos(url)")
-      .eq("status", "active")
-      .eq("kind", active.kind)
-      .order("is_vip", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(60);
-    if (active.deal) q = q.eq("deal_type", active.deal);
-    const { data, error: e } = await q;
+    const selectStr = searchParams.district
+      ? "*, districts!inner(name_ru), listing_photos(url)"
+      : "*, districts(name_ru), listing_photos(url)";
+    let query = supabase.from("listings").select(selectStr).eq("status", "active").eq("kind", active.kind);
+    if (active.deal) query = query.eq("deal_type", active.deal);
+    if (searchParams.district) query = query.eq("districts.name_ru", searchParams.district);
+    if (realty && searchParams.rooms) {
+      query = searchParams.rooms === "5+" ? query.gte("rooms", 5) : query.eq("rooms", Number(searchParams.rooms));
+    }
+    if (realty && searchParams.owner === "1") query = query.eq("owner_type", "owner");
+    if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+    query = query.order("is_vip", { ascending: false }).order("created_at", { ascending: false }).limit(100);
+
+    const { data, error: e } = await query;
     if (e) error = e.message;
-    listings = (data as Listing[]) ?? [];
+    listings = (data as unknown as Listing[]) ?? [];
+
+    // фильтр по цене (с учётом валюты) — на стороне сервера в JS
+    const mn = searchParams.pmin ? Number(searchParams.pmin) : 0;
+    const mx = searchParams.pmax ? Number(searchParams.pmax) : Infinity;
+    if (mn > 0 || mx < Infinity) {
+      listings = listings.filter((l) => {
+        const usd = l.currency === "USD" ? l.price : l.price / RATE;
+        const v = cur === "USD" ? usd : usd * RATE;
+        return v >= mn && v <= mx;
+      });
+    }
   } catch (e) {
     error = e instanceof Error ? e.message : "Ошибка подключения";
   }
 
   return (
-    <main className="mx-auto max-w-4xl">
-      <header className="sticky top-0 z-10 border-b bg-white">
-        <div className="flex items-center gap-2 px-4 pb-2 pt-3">
-          <div className="flex items-center gap-2 text-2xl font-extrabold text-brand">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-lg text-white">
-              U
-            </span>
-            Uyzo
-          </div>
-          <Link
-            href="/new"
-            className="ml-auto rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white"
-          >
-            ＋ Разместить
-          </Link>
-          <Link
-            href={session ? "/my" : "/login"}
-            className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700"
-          >
-            {session ? "👤 Мои" : "Войти"}
-          </Link>
-          <span className="hidden text-sm font-semibold text-slate-500 sm:inline">📍 Ташкент</span>
-        </div>
-        <div className="flex gap-2 overflow-x-auto px-4 pb-3">
-          {TABS.map((t) => (
-            <Link
-              key={t.key}
-              href={`/?tab=${t.key}`}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ${
-                t.key === active.key ? "bg-brand text-white" : "bg-slate-100 text-slate-500"
-              }`}
-            >
-              {t.label}
+    <div className="mx-auto max-w-5xl">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div className="px-4">
+          <div className="flex items-center gap-3 py-3">
+            <Link href="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-brand">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-base text-white">U</span>
+              Uyzo
             </Link>
-          ))}
+            <span className="hidden text-sm text-slate-400 sm:inline">· Ташкент</span>
+            <div className="ml-auto flex items-center gap-2">
+              <Link href="/new" className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark">
+                Разместить
+              </Link>
+              <Link
+                href={session ? "/my" : "/login"}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                {session ? "Кабинет" : "Войти"}
+              </Link>
+            </div>
+          </div>
+
+          <nav className="flex gap-1 overflow-x-auto pb-2">
+            {TABS.map((t) => (
+              <Link
+                key={t.key}
+                href={`/?tab=${t.key}`}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  t.key === active.key ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {t.label}
+              </Link>
+            ))}
+          </nav>
+
+          {active.kind !== "service" && <FilterBar realty={realty} />}
         </div>
       </header>
 
-      <div className="flex items-center px-4 pb-2 pt-3">
-        <h1 className="text-lg font-bold">{active.label.replace(/^\S+\s/, "")}</h1>
-        <span className="ml-auto text-sm text-slate-500">{listings.length} шт.</span>
+      <div className="flex items-center px-4 py-4">
+        <h1 className="text-lg font-bold text-slate-900">
+          {active.kind === "service" ? "Мастера и услуги" : active.label}
+        </h1>
+        <span className="ml-auto text-sm text-slate-400">{listings.length} объявлений</span>
       </div>
 
       {error && (
-        <div className="mx-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="mx-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           Не удалось загрузить объявления. Проверьте переменные окружения Supabase на Vercel.
-          <div className="mt-1 text-xs opacity-70">{error}</div>
         </div>
       )}
 
       {!error && listings.length === 0 && (
-        <div className="p-14 text-center text-sm text-slate-500">
-          Пока пусто. Запустите <code>seed.sql</code> в Supabase, чтобы добавить примеры объявлений.
+        <div className="px-4 py-16 text-center text-slate-400">
+          {active.kind === "service"
+            ? "Раздел мастеров скоро наполнится."
+            : "Ничего не найдено. Попробуйте изменить фильтры или поиск."}
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 px-4 pb-16 sm:grid-cols-3 lg:grid-cols-4">
         {listings.map((l) => (
           <ListingCard key={l.id} l={l} />
         ))}
       </div>
-    </main>
+    </div>
   );
 }

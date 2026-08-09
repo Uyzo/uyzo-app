@@ -9,40 +9,60 @@ export default function ListingCard({ l }: { l: Listing }) {
     l.kind === "realty"
       ? [l.rooms ? `${l.rooms} комн.` : null, l.area ? `${l.area} м²` : null, l.floor].filter(Boolean).join(" · ")
       : "";
+
   return (
     <Link
       href={`/listing/${l.id}`}
-      className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md"
+      className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg"
     >
-      <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-sky-100 to-indigo-100 text-4xl">
+      <div className="relative aspect-[4/3] bg-slate-100">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt="" className="h-full w-full object-cover" />
+          <img
+            src={photo}
+            alt=""
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+          />
         ) : (
-          <span>{KIND_EMOJI[l.kind]}</span>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-4xl opacity-70">
+            {KIND_EMOJI[l.kind]}
+          </div>
+        )}
+        {l.is_vip && (
+          <span className="absolute left-2 top-2 rounded-md bg-amber-400 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-950 shadow">
+            VIP
+          </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-base font-extrabold">{priceStr(l)}</span>
+
+      <div className="p-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[15px] font-extrabold tracking-tight text-slate-900">{priceStr(l)}</span>
           {idx && (
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${idx.cls}`}>
-              {idx.emoji} {idx.text}
+            <span
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${idx.cls}`}
+              title={`Оценка Uyzo AI`}
+            >
+              {idx.emoji}
             </span>
           )}
         </div>
-        <div className="line-clamp-2 text-sm">{l.title}</div>
-        {l.kind === "realty" && (
-          <span
-            className={`w-fit rounded px-2 py-0.5 text-[10px] font-bold ${
-              l.owner_type === "owner" ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            {l.owner_type === "owner" ? "Собственник ✓" : "Агентство"}
-          </span>
-        )}
-        {meta && <div className="mt-auto text-xs text-slate-500">{meta}</div>}
-        <div className="text-xs text-slate-500">📍 {l.districts?.name_ru ?? "Ташкент"}</div>
+        <div className="mt-1 line-clamp-2 min-h-[2.4em] text-[13px] leading-snug text-slate-700">{l.title}</div>
+        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-400">
+          {l.kind === "realty" && (
+            <span
+              className={`rounded px-1.5 py-0.5 font-semibold ${
+                l.owner_type === "owner" ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              {l.owner_type === "owner" ? "Собственник" : "Агентство"}
+            </span>
+          )}
+          {meta && <span>{meta}</span>}
+        </div>
+        <div className="mt-1.5 flex items-center gap-1 text-[11px] text-slate-400">
+          <span>📍 {l.districts?.name_ru ?? "Ташкент"}</span>
+        </div>
       </div>
     </Link>
   );

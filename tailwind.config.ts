@@ -5,7 +5,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: "#3b5bfd", dark: "#2843d6", light: "#eaeeff" },
+        brand: {
+          DEFAULT: "#4f46e5", // indigo-600
+          dark: "#4338ca",
+          light: "#eef2ff",
+        },
+      },
+      fontFamily: {
+        sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
       },
     },
   },
