@@ -117,7 +117,7 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
             </div>
             <h2 className="hidden text-xl font-extrabold sm:block">Найдём жильё, вещи и мастеров — рядом с вами</h2>
             <p className="mt-1 text-sm text-white/85">
-              Только реальные объявления от собственников. Разместить — бесплатно и за минуту.
+              Собственники и проверенные агентства — с честной пометкой. Фильтр «только собственники» — в один тап.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link href="/new" className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-dark">

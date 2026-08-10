@@ -93,7 +93,7 @@ export default function Login() {
 
       <h1 className="mb-1 text-2xl font-bold">Вход</h1>
       <p className="mb-6 text-sm text-slate-500">
-        {step === "phone" ? "Введите номер телефона — пришлём код." : `Код отправлен на ${phone}`}
+        Быстрый вход через Telegram — без SMS и паролей.
       </p>
 
       <div className="mb-5">
@@ -114,57 +114,9 @@ export default function Login() {
           </a>
         )}
         <p className="mt-2 text-center text-xs text-slate-400">
-          {tgInit ? "Быстрый вход в один тап" : "Рекомендуем: вход в один тап, без SMS"}
+          {tgInit ? "Быстрый вход в один тап" : "Вход в один тап, без SMS и паролей"}
         </p>
-        <div className="my-4 flex items-center gap-3 text-xs text-slate-300">
-          <div className="h-px flex-1 bg-slate-200" /> или по телефону <div className="h-px flex-1 bg-slate-200" />
-        </div>
       </div>
-
-      {step === "phone" ? (
-        <>
-          <input
-            className={field}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            inputMode="tel"
-            placeholder="+998 90 123-45-67"
-          />
-          <button
-            onClick={request}
-            disabled={busy}
-            className="mt-4 w-full rounded-xl bg-brand p-4 text-base font-semibold text-white disabled:opacity-60"
-          >
-            {busy ? "Отправляем…" : "Получить код"}
-          </button>
-        </>
-      ) : (
-        <>
-          {dev && (
-            <div className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-              Тест-режим (SMS ещё не подключён): ваш код <b>{dev}</b>
-            </div>
-          )}
-          <input
-            className={field}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            inputMode="numeric"
-            placeholder="6-значный код"
-            maxLength={6}
-          />
-          <button
-            onClick={verify}
-            disabled={busy}
-            className="mt-4 w-full rounded-xl bg-brand p-4 text-base font-semibold text-white disabled:opacity-60"
-          >
-            {busy ? "Проверяем…" : "Войти"}
-          </button>
-          <button onClick={() => setStep("phone")} className="mt-3 w-full text-sm text-slate-500">
-            Изменить номер
-          </button>
-        </>
-      )}
 
       {err && <div className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</div>}
     </main>
