@@ -277,11 +277,12 @@ export default function NewListingForm({ lang = "ru" }: { lang?: Lang }) {
     const estUsd = area * (PERM2[distEl?.value || ""] ?? 1000);
     const priceUsd = pc === "USD" ? price : price / RATE;
     const r = priceUsd / estUsd;
-    const est = pc === "USD" ? "$" + Math.round(estUsd).toLocaleString("ru-RU") : Math.round(estUsd * RATE).toLocaleString("ru-RU") + " сум";
+    const est = pc === "USD" ? "$" + Math.round(estUsd).toLocaleString("ru-RU") : Math.round(estUsd * RATE).toLocaleString("ru-RU") + " " + tr(lang, "u.sum");
     const base = "fairhint mt-2 block rounded-xl p-2 text-sm font-semibold ";
-    if (r < 0.95) { h.className = base + "bg-green-100 text-green-700"; h.textContent = `🟢 Ниже рынка. Оценка Uyzo AI ≈ ${est}`; }
-    else if (r > 1.08) { h.className = base + "bg-red-100 text-red-700"; h.textContent = `🔴 Выше рынка. Оценка Uyzo AI ≈ ${est}`; }
-    else { h.className = base + "bg-amber-100 text-amber-700"; h.textContent = `🟡 В рынке. Оценка Uyzo AI ≈ ${est}`; }
+    const aiEst = tr(lang, "d.aiEst");
+    if (r < 0.95) { h.className = base + "bg-green-100 text-green-700"; h.textContent = `🟢 ${tr(lang, "idx.low")}. ${aiEst} ${est}`; }
+    else if (r > 1.08) { h.className = base + "bg-red-100 text-red-700"; h.textContent = `🔴 ${tr(lang, "idx.high")}. ${aiEst} ${est}`; }
+    else { h.className = base + "bg-amber-100 text-amber-700"; h.textContent = `🟡 ${tr(lang, "idx.fair")}. ${aiEst} ${est}`; }
   }
   function aiFill() {
     const setVal = (name: string, v: string) => {

@@ -186,6 +186,97 @@ export const dict: Record<string, Entry> = {
   "form.toMy": { ru: "Мои объявления", uz: "Mening e'lonlarim", en: "My listings" },
   "form.toHome": { ru: "На главную", uz: "Bosh sahifa", en: "Home" },
   "loading": { ru: "Загрузка…", uz: "Yuklanmoqda…", en: "Loading…" },
+
+  // common buttons
+  "btn.logout": { ru: "Выйти", uz: "Chiqish", en: "Log out" },
+  "btn.delete": { ru: "Удалить", uz: "O'chirish", en: "Delete" },
+  "btn.edit": { ru: "Изменить", uz: "Tahrirlash", en: "Edit" },
+  "btn.back": { ru: "← На главную", uz: "← Bosh sahifa", en: "← Home" },
+  "err.generic": { ru: "Ошибка", uz: "Xatolik", en: "Error" },
+
+  // my listings
+  "my.title": { ru: "Мои объявления", uz: "Mening e'lonlarim", en: "My listings" },
+  "my.needLogin": { ru: "Войдите, чтобы видеть свои объявления.", uz: "E'lonlaringizni ko'rish uchun tizimga kiring.", en: "Log in to see your listings." },
+  "my.moderation": { ru: "Модерация", uz: "Moderatsiya", en: "Moderation" },
+  "my.account": { ru: "Аккаунт", uz: "Akkaunt", en: "Account" },
+  "my.postCta": { ru: "＋ Разместить объявление", uz: "＋ E'lon joylash", en: "＋ Post a listing" },
+  "my.empty": { ru: "У вас пока нет объявлений.", uz: "Sizda hali e'lonlar yo'q.", en: "You have no listings yet." },
+  "del.confirm": { ru: "Удалить это объявление? Действие необратимо.", uz: "Bu e'lon o'chirilsinmi? Amalni qaytarib bo'lmaydi.", en: "Delete this listing? This can't be undone." },
+  "del.fail": { ru: "Не удалось удалить", uz: "O'chirib bo'lmadi", en: "Couldn't delete" },
+
+  // status (short labels)
+  "s.active": { ru: "Активно", uz: "Faol", en: "Active" },
+  "s.pending": { ru: "На модерации", uz: "Moderatsiyada", en: "In review" },
+  "s.rejected": { ru: "Отклонено", uz: "Rad etilgan", en: "Rejected" },
+  "s.draft": { ru: "Черновик", uz: "Qoralama", en: "Draft" },
+  "s.archived": { ru: "В архиве", uz: "Arxivda", en: "Archived" },
+
+  // relogin
+  "relogin.title": { ru: "Аккаунты объединены", uz: "Akkauntlar birlashtirildi", en: "Accounts merged" },
+  "relogin.sub": {
+    ru: "Ваши входы теперь ведут в один аккаунт. Войдите заново, чтобы продолжить с объединённым профилем.",
+    uz: "Kirishlaringiz endi bitta akkauntga olib boradi. Birlashgan profil bilan davom etish uchun qaytadan kiring.",
+    en: "Your logins now lead to one account. Log in again to continue with the merged profile.",
+  },
+  "relogin.btn": { ru: "Войти заново", uz: "Qaytadan kirish", en: "Log in again" },
+
+  // settings
+  "set.title": { ru: "Аккаунт", uz: "Akkaunt", en: "Account" },
+  "set.titleFull": { ru: "Аккаунт и вход", uz: "Akkaunt va kirish", en: "Account & login" },
+  "set.subsTitle": { ru: "🔔 Подписки на новые объявления", uz: "🔔 Yangi e'lonlarga obunalar", en: "🔔 New-listing subscriptions" },
+  "set.subsNoTg": {
+    ru: "Уведомления приходят в Telegram. Привяжите Telegram выше — и подписки станут доступны.",
+    uz: "Bildirishnomalar Telegram'ga keladi. Yuqorida Telegram'ni ulang — obunalar ochiladi.",
+    en: "Notifications arrive in Telegram. Link Telegram above to enable subscriptions.",
+  },
+  "set.subsEmpty": {
+    ru: "Подписок пока нет. На главной задайте фильтры и нажмите «🔔 Уведомлять о новых».",
+    uz: "Obunalar yo'q. Bosh sahifada filtr tanlab, «🔔 Yangilardan xabar» tugmasini bosing.",
+    en: "No subscriptions yet. Set filters on the home page and tap “🔔 Notify me”.",
+  },
+
+  // link panel
+  "link.intro": {
+    ru: "Привяжите оба способа входа к одному аккаунту, чтобы заходить и по телефону, и через Telegram — и видеть все свои объявления в одном месте.",
+    uz: "Ikkala kirish usulini bitta akkauntga ulang — telefon va Telegram orqali kiring, barcha e'lonlaringizni bir joyda ko'ring.",
+    en: "Link both login methods to one account — sign in by phone or Telegram and see all your listings in one place.",
+  },
+  "link.phone": { ru: "📱 Телефон", uz: "📱 Telefon", en: "📱 Phone" },
+  "link.tg": { ru: "✈️ Telegram", uz: "✈️ Telegram", en: "✈️ Telegram" },
+  "link.notLinked": { ru: "не привязан", uz: "ulanmagan", en: "not linked" },
+  "link.linked": { ru: "Привязан", uz: "Ulangan", en: "Linked" },
+  "link.getCode": { ru: "Код", uz: "Kod", en: "Code" },
+  "link.codePh": { ru: "Код", uz: "Kod", en: "Code" },
+  "link.testMode": { ru: "Тест-режим: код", uz: "Test rejim: kod", en: "Test mode: code" },
+  "link.bind": { ru: "Привязать", uz: "Ulash", en: "Link" },
+  "link.bindTg": { ru: "Привязать Telegram", uz: "Telegram'ni ulash", en: "Link Telegram" },
+  "link.tgHint": {
+    ru: "Чтобы привязать Telegram, откройте Uyzo внутри Telegram (через бота) и зайдите сюда снова.",
+    uz: "Telegram'ni ulash uchun Uyzo'ni Telegram ichida (bot orqali) oching va bu yerga qayting.",
+    en: "To link Telegram, open Uyzo inside Telegram (via the bot) and come back here.",
+  },
+  "link.phoneDone": { ru: "Телефон привязан ✓", uz: "Telefon ulandi ✓", en: "Phone linked ✓" },
+  "link.tgDone": { ru: "Telegram привязан ✓", uz: "Telegram ulandi ✓", en: "Telegram linked ✓" },
+
+  // admin
+  "adm.title": { ru: "Админ-панель", uz: "Admin panel", en: "Admin panel" },
+  "adm.needLogin": { ru: "Войдите, чтобы продолжить.", uz: "Davom etish uchun kiring.", en: "Log in to continue." },
+  "adm.noAccess": { ru: "Нет доступа", uz: "Ruxsat yo'q", en: "No access" },
+  "adm.sqlHint": {
+    ru: "Чтобы стать администратором, выполните этот запрос в Supabase → SQL Editor:",
+    uz: "Administrator bo'lish uchun Supabase → SQL Editor'da ushbu so'rovni bajaring:",
+    en: "To become an admin, run this query in Supabase → SQL Editor:",
+  },
+  "adm.refresh": { ru: "Затем обновите эту страницу.", uz: "So'ng ushbu sahifani yangilang.", en: "Then refresh this page." },
+  "adm.moderation": { ru: "Модерация", uz: "Moderatsiya", en: "Moderation" },
+  "adm.count": { ru: "на проверке", uz: "tekshiruvda", en: "in review" },
+  "adm.empty": {
+    ru: "✅ Очередь пуста. Новых объявлений на проверке нет.",
+    uz: "✅ Navbat bo'sh. Tekshiruvda yangi e'lonlar yo'q.",
+    en: "✅ Queue is empty. No new listings to review.",
+  },
+  "adm.approve": { ru: "✓ Одобрить", uz: "✓ Tasdiqlash", en: "✓ Approve" },
+  "adm.reject": { ru: "✕ Отклонить", uz: "✕ Rad etish", en: "✕ Reject" },
 };
 
 export function t(lang: Lang, key: string): string {

@@ -3,31 +3,33 @@ import { getSession } from "@/lib/session";
 import { getAdmin } from "@/lib/supabaseAdmin";
 import { type Listing } from "@/lib/supabase";
 import { priceStr } from "@/lib/format";
+import { getT } from "@/lib/i18n-server";
 import LogoutButton from "../components/LogoutButton";
 import DeleteButton from "../components/DeleteButton";
 import ReloginNotice from "../components/ReloginNotice";
 
 export const dynamic = "force-dynamic";
 
-const STATUS: Record<string, { t: string; cls: string }> = {
-  active: { t: "Активно", cls: "bg-green-100 text-green-700" },
-  pending: { t: "На модерации", cls: "bg-amber-100 text-amber-700" },
-  rejected: { t: "Отклонено", cls: "bg-red-100 text-red-700" },
-  draft: { t: "Черновик", cls: "bg-slate-100 text-slate-600" },
-  archived: { t: "В архиве", cls: "bg-slate-100 text-slate-600" },
+const STATUS_CLS: Record<string, string> = {
+  active: "bg-green-100 text-green-700",
+  pending: "bg-amber-100 text-amber-700",
+  rejected: "bg-red-100 text-red-700",
+  draft: "bg-slate-100 text-slate-600",
+  archived: "bg-slate-100 text-slate-600",
 };
 
 export default async function MyListings() {
   const session = getSession();
+  const { lang, t } = getT();
 
   if (!session) {
     return (
       <main className="mx-auto max-w-md p-6 text-center">
         <div className="mt-10 text-5xl">👤</div>
-        <h1 className="mt-4 text-2xl font-bold">Мои объявления</h1>
-        <p className="mt-2 text-slate-600">Войдите по номеру телефона, чтобы видеть свои объявления.</p>
+        <h1 className="mt-4 text-2xl font-bold">{t("my.title")}</h1>
+        <p className="mt-2 text-slate-600">{t("my.needLogin")}</p>
         <Link href="/login" className="mt-6 inline-block rounded-xl bg-brand px-6 py-3 font-semibold text-white">
-          Войти
+          {t("nav.login")}
         </Link>
       </main>
     );
@@ -35,7 +37,7 @@ export default async function MyListings() {
 
   const admin = getAdmin();
   const { data: me } = await admin.from("profiles").select("role").eq("id", session.pid).maybeSingle();
-  if (!me) return <ReloginNotice />;
+  if (!me) return <ReloginNotice lang={lang} />;
   const isAdmin = me.role === "admin";
 
   let items: Listing[] = [];
@@ -54,29 +56,30 @@ export default async function MyListings() {
     <main className="mx-auto max-w-2xl pb-16">
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b bg-white px-4 py-3">
         <Link href="/" className="text-2xl">←</Link>
-        <b className="text-base">Мои объявления</b>
+        <b className="text-base">{t("my.title")}</b>
         {isAdmin && (
           <Link href="/admin" className="ml-auto rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-700">
-            Модерация
+            {t("my.moderation")}
           </Link>
         )}
         <Link href="/settings" className={`${isAdmin ? "" : "ml-auto"} text-sm font-semibold text-slate-500 hover:text-brand`}>
-          Аккаунт
+          {t("my.account")}
         </Link>
-        <LogoutButton />
+        <LogoutButton lang={lang} />
       </div>
 
       <div className="p-4">
         <Link href="/new" className="mb-4 block rounded-xl bg-brand p-3 text-center font-semibold text-white">
-          ＋ Разместить объявление
+          {t("my.postCta")}
         </Link>
 
         {items.length === 0 ? (
-          <div className="py-14 text-center text-slate-500">У вас пока нет объявлений.</div>
+          <div className="py-14 text-center text-slate-500">{t("my.empty")}</div>
         ) : (
           <div className="space-y-3">
             {items.map((l) => {
-              const st = STATUS[l.status as string] ?? STATUS.active;
+              const stKey = (l.status as string) || "active";
+              const stCls = STATUS_CLS[stKey] ?? STATUS_CLS.active;
               const photo = l.listing_photos?.[0]?.url;
               return (
                 <div key={l.id} className="rounded-2xl border border-slate-200 bg-white p-3">
@@ -92,18 +95,18 @@ export default async function MyListings() {
                     <Link href={`/listing/${l.id}`} className="min-w-0 flex-1">
                       <div className="truncate text-sm font-semibold">{l.title}</div>
                       <div className="text-xs text-slate-500">
-                        {priceStr(l)} · {l.districts?.name_ru ?? "Ташкент"}
+                        {priceStr(l, lang)} · {l.districts?.name_ru ?? t("city.tashkent")}
                       </div>
-                      <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${st.cls}`}>
-                        {st.t}
+                      <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${stCls}`}>
+                        {t("s." + stKey)}
                       </span>
                     </Link>
                   </div>
                   <div className="mt-2 flex justify-end gap-1 border-t border-slate-100 pt-2">
                     <Link href={`/new?id=${l.id}`} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-brand hover:bg-brand-light">
-                      Изменить
+                      {t("btn.edit")}
                     </Link>
-                    <DeleteButton id={l.id} />
+                    <DeleteButton id={l.id} lang={lang} />
                   </div>
                 </div>
               );
