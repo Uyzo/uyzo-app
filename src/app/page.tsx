@@ -3,6 +3,7 @@ import { getSupabase, type Listing } from "@/lib/supabase";
 import { getSession } from "@/lib/session";
 import ListingCard from "./components/ListingCard";
 import FilterBar from "./components/FilterBar";
+import Mascot from "./components/Mascot";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +103,32 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
           {active.kind !== "service" && <FilterBar realty={realty} />}
         </div>
       </header>
+
+      <section className="px-4 pt-4">
+        <div className="flex items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br from-brand to-violet-600 p-5 text-white">
+          <div className="hidden shrink-0 rounded-2xl bg-white/15 p-2 sm:block">
+            <Mascot size={72} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 sm:hidden">
+              <div className="rounded-xl bg-white/15 p-1"><Mascot size={40} /></div>
+              <h2 className="text-lg font-extrabold">Добро пожаловать в Uyzo!</h2>
+            </div>
+            <h2 className="hidden text-xl font-extrabold sm:block">Найдём жильё, вещи и мастеров — рядом с вами</h2>
+            <p className="mt-1 text-sm text-white/85">
+              Только реальные объявления от собственников. Разместить — бесплатно и за минуту.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href="/new" className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-dark">
+                ＋ Разместить бесплатно
+              </Link>
+              <Link href="/?tab=goods" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white">
+                Смотреть объявления
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="flex items-center px-4 py-4">
         <h1 className="text-lg font-bold text-slate-900">

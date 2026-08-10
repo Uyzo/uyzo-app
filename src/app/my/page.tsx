@@ -58,9 +58,9 @@ export default async function MyListings() {
             Модерация
           </Link>
         )}
-        <span className={`${isAdmin ? "" : "ml-auto"} text-sm text-slate-500`}>
-          {session.phone.replace(/^998/, "+998 ")}
-        </span>
+        <Link href="/settings" className={`${isAdmin ? "" : "ml-auto"} text-sm font-semibold text-slate-500 hover:text-brand`}>
+          Аккаунт
+        </Link>
         <LogoutButton />
       </div>
 
