@@ -42,7 +42,9 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
     if (realty && searchParams.rooms) {
       query = searchParams.rooms === "5+" ? query.gte("rooms", 5) : query.eq("rooms", Number(searchParams.rooms));
     }
-    if (realty && searchParams.owner === "1") query = query.eq("owner_type", "owner");
+    if (realty && (searchParams.owner === "owner" || searchParams.owner === "agent")) {
+      query = query.eq("owner_type", searchParams.owner);
+    }
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
     query = query.order("is_vip", { ascending: false }).order("created_at", { ascending: false }).limit(100);
 
@@ -130,6 +132,9 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
                 ✈️ Открыть в Telegram
               </a>
             </div>
+            <Link href="/help" className="mt-3 inline-block text-xs font-semibold text-white/85 underline underline-offset-2">
+              ❓ Как пользоваться Uyzo
+            </Link>
           </div>
         </div>
       </section>

@@ -19,7 +19,7 @@ export default function FilterBar({ realty }: { realty: boolean }) {
   const [pmax, setPmax] = useState(sp.get("pmax") ?? "");
   const [district, setDistrict] = useState(sp.get("district") ?? "");
   const [rooms, setRooms] = useState(sp.get("rooms") ?? "");
-  const [owner, setOwner] = useState(sp.get("owner") === "1");
+  const [owner, setOwner] = useState(sp.get("owner") ?? "");
 
   function apply(e?: React.FormEvent) {
     e?.preventDefault();
@@ -32,14 +32,22 @@ export default function FilterBar({ realty }: { realty: boolean }) {
     if (pmax) p.set("pmax", pmax);
     if (district) p.set("district", district);
     if (realty && rooms) p.set("rooms", rooms);
-    if (realty && owner) p.set("owner", "1");
+    if (realty && owner) p.set("owner", owner);
     router.push(`/?${p.toString()}`);
   }
 
   function reset() {
     const tab = sp.get("tab");
     router.push(tab ? `/?tab=${tab}` : "/");
-    setQ(""); setPmin(""); setPmax(""); setDistrict(""); setRooms(""); setOwner(false); setCur("UZS");
+    setQ(""); setPmin(""); setPmax(""); setDistrict(""); setRooms(""); setOwner(""); setCur("UZS");
+  }
+
+  // мгновенное применение при выборе типа продавца
+  function applyOwner(v: string) {
+    setOwner(v);
+    const p = new URLSearchParams(sp.toString());
+    if (v) p.set("owner", v); else p.delete("owner");
+    router.push(`/?${p.toString()}`);
   }
 
   const sel = "rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-brand";
@@ -47,6 +55,20 @@ export default function FilterBar({ realty }: { realty: boolean }) {
 
   return (
     <form onSubmit={apply} className="space-y-2 pb-3">
+      {realty && (
+        <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-white">
+          {[["", "Все"], ["owner", "Собственники"], ["agent", "Агентства"]].map(([v, t]) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => applyOwner(v)}
+              className={`flex-1 px-3 py-2 text-sm font-semibold transition ${owner === v ? "bg-brand text-white" : "text-slate-600 hover:bg-slate-50"}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="flex gap-2">
         <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
           <span className="text-slate-400">🔍</span>
@@ -92,16 +114,6 @@ export default function FilterBar({ realty }: { realty: boolean }) {
             <option value="">Комнаты</option>
             {["1", "2", "3", "4", "5+"].map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
-        )}
-
-        {realty && (
-          <button
-            type="button"
-            onClick={() => setOwner((v) => !v)}
-            className={`rounded-xl border px-3 py-2 text-sm font-semibold ${owner ? "border-brand bg-brand-light text-brand-dark" : "border-slate-200 bg-white text-slate-500"}`}
-          >
-            Только собственники
-          </button>
         )}
 
         <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Применить</button>
