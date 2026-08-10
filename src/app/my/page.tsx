@@ -5,6 +5,7 @@ import { type Listing } from "@/lib/supabase";
 import { priceStr } from "@/lib/format";
 import LogoutButton from "../components/LogoutButton";
 import DeleteButton from "../components/DeleteButton";
+import ReloginNotice from "../components/ReloginNotice";
 
 export const dynamic = "force-dynamic";
 
@@ -32,12 +33,13 @@ export default async function MyListings() {
     );
   }
 
+  const admin = getAdmin();
+  const { data: me } = await admin.from("profiles").select("role").eq("id", session.pid).maybeSingle();
+  if (!me) return <ReloginNotice />;
+  const isAdmin = me.role === "admin";
+
   let items: Listing[] = [];
-  let isAdmin = false;
   try {
-    const admin = getAdmin();
-    const { data: me } = await admin.from("profiles").select("role").eq("id", session.pid).maybeSingle();
-    isAdmin = me?.role === "admin";
     const { data } = await admin
       .from("listings")
       .select("*, districts(name_ru), listing_photos(url)")

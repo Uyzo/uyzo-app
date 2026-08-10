@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { getAdmin } from "@/lib/supabaseAdmin";
 import LinkPanel from "../components/LinkPanel";
+import ReloginNotice from "../components/ReloginNotice";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function Settings() {
 
   const admin = getAdmin();
   const { data: me } = await admin.from("profiles").select("phone, telegram_id, full_name").eq("id", session.pid).maybeSingle();
+  if (!me) return <ReloginNotice />;
 
   return (
     <main className="mx-auto max-w-md pb-16">
