@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import TelegramLoginWidget from "../components/TelegramLoginWidget";
+import TgLoginButton from "../components/TgLoginButton";
 
 const BOT = process.env.NEXT_PUBLIC_TG_BOT || "UyzoAppBot";
 const TG_URL = `https://t.me/${BOT}`;
@@ -111,11 +111,8 @@ export default function Login() {
           </>
         ) : (
           <>
-            <TelegramLoginWidget bot={BOT} />
-            <p className="mt-2 text-center text-xs text-slate-400">
-              Войдите через Telegram — тот же аккаунт, что и в приложении. Без SMS и паролей.
-            </p>
-            <a href={TG_URL} className="mt-2 block text-center text-xs font-semibold text-[#229ED9]">
+            <TgLoginButton />
+            <a href={TG_URL} className="mt-3 block text-center text-xs font-semibold text-[#229ED9]">
               или открыть приложение в Telegram →
             </a>
           </>

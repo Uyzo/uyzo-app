@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getAdmin } from "@/lib/supabaseAdmin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +15,22 @@ export async function POST(req: Request) {
     const msg = update?.message;
     const text: string = msg?.text || "";
     const chatId = msg?.chat?.id;
+    const fromId = msg?.from?.id;
     const name = msg?.from?.first_name || "";
+
+    // Подтверждение входа на сайте: /start uyzo_<token>
+    const loginMatch = text.match(/^\/start\s+uyzo_(\S+)/);
+    if (chatId && fromId && loginMatch) {
+      const loginToken = loginMatch[1];
+      const admin = getAdmin();
+      await admin.from("login_tokens").update({ telegram_id: fromId }).eq("token", loginToken);
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: "✅ Вход подтверждён! Вернитесь на сайт — вы уже вошли." }),
+      });
+      return NextResponse.json({ ok: true });
+    }
 
     if (chatId && text.startsWith("/start")) {
       const welcome =
