@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+const BOT = process.env.NEXT_PUBLIC_TG_BOT || "UyzoAppBot";
+const TG_URL = `https://t.me/${BOT}`;
+
 export default function Login() {
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [phone, setPhone] = useState("+998 ");
@@ -93,8 +96,8 @@ export default function Login() {
         {step === "phone" ? "Введите номер телефона — пришлём код." : `Код отправлен на ${phone}`}
       </p>
 
-      {tgInit && (
-        <div className="mb-5">
+      <div className="mb-5">
+        {tgInit ? (
           <button
             onClick={loginTelegram}
             disabled={busy}
@@ -102,9 +105,21 @@ export default function Login() {
           >
             ✈️ Войти через Telegram
           </button>
-          <div className="my-3 text-center text-xs text-slate-400">или по номеру телефона</div>
+        ) : (
+          <a
+            href={TG_URL}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#229ED9] p-4 text-base font-semibold text-white"
+          >
+            ✈️ Открыть в Telegram
+          </a>
+        )}
+        <p className="mt-2 text-center text-xs text-slate-400">
+          {tgInit ? "Быстрый вход в один тап" : "Рекомендуем: вход в один тап, без SMS"}
+        </p>
+        <div className="my-4 flex items-center gap-3 text-xs text-slate-300">
+          <div className="h-px flex-1 bg-slate-200" /> или по телефону <div className="h-px flex-1 bg-slate-200" />
         </div>
-      )}
+      </div>
 
       {step === "phone" ? (
         <>

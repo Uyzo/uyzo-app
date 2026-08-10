@@ -8,6 +8,7 @@ import Mascot from "./components/Mascot";
 export const dynamic = "force-dynamic";
 
 const RATE = 12700;
+const BOT = process.env.NEXT_PUBLIC_TG_BOT || "UyzoAppBot";
 
 const TABS = [
   { key: "sale", label: "Купить", kind: "realty", deal: "sale" },
@@ -122,9 +123,12 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
               <Link href="/new" className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-dark">
                 ＋ Разместить бесплатно
               </Link>
-              <Link href="/?tab=goods" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white">
-                Смотреть объявления
-              </Link>
+              <a
+                href={`https://t.me/${BOT}`}
+                className="rounded-xl bg-[#229ED9] px-4 py-2 text-sm font-semibold text-white"
+              >
+                ✈️ Открыть в Telegram
+              </a>
             </div>
           </div>
         </div>
