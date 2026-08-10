@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import ListingCard from "./components/ListingCard";
 import FilterBar from "./components/FilterBar";
 import Mascot from "./components/Mascot";
+import SubscribeButton from "./components/SubscribeButton";
 
 export const dynamic = "force-dynamic";
 
@@ -139,11 +140,14 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
         </div>
       </section>
 
-      <div className="flex items-center px-4 py-4">
+      <div className="flex items-center gap-3 px-4 py-4">
         <h1 className="text-lg font-bold text-slate-900">
           {active.kind === "service" ? "Мастера и услуги" : active.label}
         </h1>
-        <span className="ml-auto text-sm text-slate-400">{listings.length} объявлений</span>
+        <span className="text-sm text-slate-400">· {listings.length}</span>
+        <div className="ml-auto">
+          <SubscribeButton />
+        </div>
       </div>
 
       {error && (
