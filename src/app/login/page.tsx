@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import TelegramLoginWidget from "../components/TelegramLoginWidget";
 
 const BOT = process.env.NEXT_PUBLIC_TG_BOT || "UyzoAppBot";
 const TG_URL = `https://t.me/${BOT}`;
@@ -98,24 +99,27 @@ export default function Login() {
 
       <div className="mb-5">
         {tgInit ? (
-          <button
-            onClick={loginTelegram}
-            disabled={busy}
-            className="w-full rounded-xl bg-[#229ED9] p-4 text-base font-semibold text-white disabled:opacity-60"
-          >
-            ✈️ Войти через Telegram
-          </button>
+          <>
+            <button
+              onClick={loginTelegram}
+              disabled={busy}
+              className="w-full rounded-xl bg-[#229ED9] p-4 text-base font-semibold text-white disabled:opacity-60"
+            >
+              ✈️ Войти через Telegram
+            </button>
+            <p className="mt-2 text-center text-xs text-slate-400">Быстрый вход в один тап</p>
+          </>
         ) : (
-          <a
-            href={TG_URL}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#229ED9] p-4 text-base font-semibold text-white"
-          >
-            ✈️ Открыть в Telegram
-          </a>
+          <>
+            <TelegramLoginWidget bot={BOT} />
+            <p className="mt-2 text-center text-xs text-slate-400">
+              Войдите через Telegram — тот же аккаунт, что и в приложении. Без SMS и паролей.
+            </p>
+            <a href={TG_URL} className="mt-2 block text-center text-xs font-semibold text-[#229ED9]">
+              или открыть приложение в Telegram →
+            </a>
+          </>
         )}
-        <p className="mt-2 text-center text-xs text-slate-400">
-          {tgInit ? "Быстрый вход в один тап" : "Вход в один тап, без SMS и паролей"}
-        </p>
       </div>
 
       {err && <div className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{err}</div>}

@@ -77,6 +77,9 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
               Uyzo
             </Link>
             <span className="hidden text-sm text-slate-400 sm:inline">· Ташкент</span>
+            <Link href="/help" className="ml-1 rounded-lg px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100">
+              Как пользоваться
+            </Link>
             <div className="ml-auto flex items-center gap-2">
               <Link href="/new" className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark">
                 Разместить

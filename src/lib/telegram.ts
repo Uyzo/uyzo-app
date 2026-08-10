@@ -28,3 +28,17 @@ export function verifyInitData(initData: string, botToken: string): TgUser | nul
     return null;
   }
 }
+
+// Проверка данных Telegram Login Widget (вход на сайте в браузере)
+export function verifyLoginWidget(query: Record<string, string>, botToken: string): TgUser | null {
+  if (!botToken || !query.hash) return null;
+  const { hash, ...rest } = query;
+  const dcs = Object.keys(rest)
+    .sort()
+    .map((k) => `${k}=${rest[k]}`)
+    .join("\n");
+  const secret = crypto.createHash("sha256").update(botToken).digest();
+  const computed = crypto.createHmac("sha256", secret).update(dcs).digest("hex");
+  if (computed !== hash) return null;
+  return { id: Number(rest.id), first_name: rest.first_name, username: rest.username };
+}
