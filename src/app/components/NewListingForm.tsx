@@ -3,15 +3,21 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { t as tr, type Lang } from "@/lib/i18n";
 
-const CATS: Record<string, { slug: string; t: string }[]> = {
+const CATS: Record<string, { slug: string; label: Record<Lang, string> }[]> = {
   realty: [
-    { slug: "apartment", t: "Квартира" }, { slug: "house", t: "Дом" },
-    { slug: "room", t: "Комната" }, { slug: "commercial", t: "Коммерция" },
+    { slug: "apartment", label: { ru: "Квартира", uz: "Kvartira", en: "Apartment" } },
+    { slug: "house", label: { ru: "Дом", uz: "Uy", en: "House" } },
+    { slug: "room", label: { ru: "Комната", uz: "Xona", en: "Room" } },
+    { slug: "commercial", label: { ru: "Коммерция", uz: "Tijorat", en: "Commercial" } },
   ],
   goods: [
-    { slug: "transport", t: "Транспорт" }, { slug: "electronics", t: "Электроника" },
-    { slug: "home", t: "Для дома" }, { slug: "fashion", t: "Мода" }, { slug: "jobs", t: "Работа" },
+    { slug: "transport", label: { ru: "Транспорт", uz: "Transport", en: "Transport" } },
+    { slug: "electronics", label: { ru: "Электроника", uz: "Elektronika", en: "Electronics" } },
+    { slug: "home", label: { ru: "Для дома", uz: "Uy uchun", en: "Home" } },
+    { slug: "fashion", label: { ru: "Мода", uz: "Moda", en: "Fashion" } },
+    { slug: "jobs", label: { ru: "Работа", uz: "Ish", en: "Jobs" } },
   ],
 };
 const DISTRICTS = [
@@ -26,9 +32,10 @@ type Init = {
   owner_type: string; districts: { name_ru: string } | null;
 };
 
-export default function NewListingForm() {
+export default function NewListingForm({ lang = "ru" }: { lang?: Lang }) {
   const sp = useSearchParams();
   const editId = sp.get("id");
+  const t = (k: string) => tr(lang, k);
 
   const [kind, setKind] = useState<"realty" | "goods">("realty");
   const [deal, setDeal] = useState<"sale" | "rent">("sale");
@@ -86,19 +93,19 @@ export default function NewListingForm() {
     }
   }
 
-  if (!ready) return <div className="p-10 text-center text-slate-400">Загрузка…</div>;
+  if (!ready) return <div className="p-10 text-center text-slate-400">{t("loading")}</div>;
 
   if (status === "done") {
     return (
       <div className="mx-auto max-w-2xl p-6 text-center">
         <div className="mt-10 text-5xl">{editId ? "✅" : "🕒"}</div>
-        <h1 className="mt-4 text-2xl font-bold">{editId ? "Изменения сохранены" : "Отправлено на модерацию"}</h1>
+        <h1 className="mt-4 text-2xl font-bold">{editId ? t("form.doneEdit") : t("form.doneNew")}</h1>
         <p className="mt-2 text-slate-600">
-          {editId ? "Объявление обновлено." : "Мы проверим объявление и опубликуем его. Статус — в «Кабинете»."}
+          {editId ? t("form.doneEditSub") : t("form.doneNewSub")}
         </p>
         <div className="mt-6 flex justify-center gap-3">
-          <Link href="/my" className="rounded-xl bg-brand px-5 py-3 font-semibold text-white">Мои объявления</Link>
-          <Link href="/" className="rounded-xl bg-brand-light px-5 py-3 font-semibold text-brand-dark">На главную</Link>
+          <Link href="/my" className="rounded-xl bg-brand px-5 py-3 font-semibold text-white">{t("form.toMy")}</Link>
+          <Link href="/" className="rounded-xl bg-brand-light px-5 py-3 font-semibold text-brand-dark">{t("form.toHome")}</Link>
         </div>
       </div>
     );
@@ -108,28 +115,28 @@ export default function NewListingForm() {
     <div className="mx-auto max-w-2xl pb-16">
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
         <Link href={editId ? "/my" : "/"} className="text-2xl">←</Link>
-        <b className="text-base">{editId ? "Редактирование объявления" : "Новое объявление"}</b>
+        <b className="text-base">{editId ? t("form.editTitle") : t("form.newTitle")}</b>
       </div>
 
       <form key={init?.id ?? "new"} onSubmit={submit} className="space-y-4 p-4">
         {!editId && (
           <div className="rounded-2xl bg-gradient-to-br from-brand to-violet-600 p-4 text-white">
-            <h3 className="text-sm font-bold">✨ Сфоткай и продай</h3>
-            <p className="mb-3 mt-1 text-xs opacity-90">Загрузите фото — AI напишет заголовок, описание и подскажет цену.</p>
+            <h3 className="text-sm font-bold">{t("form.aiTitle")}</h3>
+            <p className="mb-3 mt-1 text-xs opacity-90">{t("form.aiSub")}</p>
             <button type="button" onClick={aiFill} className="w-full rounded-xl bg-white p-2.5 text-sm font-bold text-brand-dark">
-              ✨ Заполнить автоматически (демо)
+              {t("form.aiBtn")}
             </button>
           </div>
         )}
 
         {!editId && (
           <div>
-            <span className={label}>Раздел</span>
+            <span className={label}>{t("form.section")}</span>
             <div className="flex gap-2">
               {(["realty", "goods"] as const).map((k) => (
                 <button key={k} type="button" onClick={() => setKind(k)}
                   className={`flex-1 rounded-xl border p-3 font-semibold ${kind === k ? "border-brand bg-brand-light text-brand-dark" : "border-slate-200"}`}>
-                  {k === "realty" ? "Недвижимость" : "Товар / услуга"}
+                  {k === "realty" ? t("form.realty") : t("form.goods")}
                 </button>
               ))}
             </div>
@@ -138,12 +145,12 @@ export default function NewListingForm() {
 
         {kind === "realty" && (
           <div>
-            <span className={label}>Тип сделки</span>
+            <span className={label}>{t("form.dealType")}</span>
             <div className="flex gap-2">
               {(["sale", "rent"] as const).map((d) => (
                 <button key={d} type="button" onClick={() => setDeal(d)}
                   className={`flex-1 rounded-xl border p-3 font-semibold ${deal === d ? "border-brand bg-brand-light text-brand-dark" : "border-slate-200"}`}>
-                  {d === "sale" ? "Продажа" : "Аренда"}
+                  {d === "sale" ? t("form.sale") : t("form.rent")}
                 </button>
               ))}
             </div>
@@ -152,24 +159,24 @@ export default function NewListingForm() {
 
         {!editId && (
           <div>
-            <label className={label}>Категория</label>
+            <label className={label}>{t("form.category")}</label>
             <select name="category" className={field} defaultValue={CATS[kind][0].slug} key={kind}>
-              {CATS[kind].map((c) => <option key={c.slug} value={c.slug}>{c.t}</option>)}
+              {CATS[kind].map((c) => <option key={c.slug} value={c.slug}>{c.label[lang]}</option>)}
             </select>
           </div>
         )}
 
         <div>
-          <label className={label}>Заголовок</label>
-          <input name="title" required defaultValue={init?.title ?? ""} placeholder="Напр. 2-комн. квартира, Юнусабад" className={field} />
+          <label className={label}>{t("form.title")}</label>
+          <input name="title" required defaultValue={init?.title ?? ""} placeholder={t("form.titlePh")} className={field} />
         </div>
 
         <div>
-          <label className={label}>Цена</label>
+          <label className={label}>{t("form.price")}</label>
           <div className="flex gap-2">
-            <input name="price" type="number" defaultValue={init?.price || ""} placeholder="Сумма" className={field} onInput={fairHint} />
+            <input name="price" type="number" defaultValue={init?.price || ""} placeholder={t("form.priceSum")} className={field} onInput={fairHint} />
             <select name="currency" defaultValue={init?.currency ?? "UZS"} className="rounded-xl border border-slate-200 p-3" onChange={fairHint}>
-              <option value="UZS">сум</option>
+              <option value="UZS">{tr(lang, "u.sum")}</option>
               <option value="USD">$</option>
             </select>
           </div>
@@ -178,17 +185,17 @@ export default function NewListingForm() {
 
         {kind === "realty" && (
           <div className="flex gap-2">
-            <div className="flex-1"><label className={label}>Комнат</label>
+            <div className="flex-1"><label className={label}>{t("form.rooms")}</label>
               <input name="rooms" type="number" defaultValue={init?.rooms || ""} placeholder="2" className={field} onInput={fairHint} /></div>
-            <div className="flex-1"><label className={label}>Площадь, м²</label>
+            <div className="flex-1"><label className={label}>{t("form.area")}</label>
               <input name="area" type="number" defaultValue={init?.area || ""} placeholder="58" className={field} onInput={fairHint} /></div>
-            <div className="flex-1"><label className={label}>Этаж</label>
+            <div className="flex-1"><label className={label}>{t("form.floor")}</label>
               <input name="floor" defaultValue={init?.floor ?? ""} placeholder="5/9" className={field} /></div>
           </div>
         )}
 
         <div>
-          <label className={label}>Район</label>
+          <label className={label}>{t("form.district")}</label>
           <select name="district" defaultValue={init?.districts?.name_ru ?? DISTRICTS[0]} className={field} onChange={fairHint}>
             {DISTRICTS.map((d) => <option key={d}>{d}</option>)}
           </select>
@@ -196,27 +203,27 @@ export default function NewListingForm() {
 
         {kind === "realty" && (
           <div>
-            <label className={label}>Кто размещает</label>
+            <label className={label}>{t("form.who")}</label>
             <select name="owner_type" defaultValue={init?.owner_type ?? "owner"} className={field}>
-              <option value="owner">Собственник</option>
-              <option value="agent">Агентство</option>
+              <option value="owner">{t("form.owner")}</option>
+              <option value="agent">{t("form.agent")}</option>
             </select>
           </div>
         )}
 
         <div>
-          <label className={label}>Описание</label>
-          <textarea name="description" rows={3} defaultValue={init?.description ?? ""} placeholder="Опишите объект/товар подробно…" className={field} />
+          <label className={label}>{t("form.desc")}</label>
+          <textarea name="description" rows={3} defaultValue={init?.description ?? ""} placeholder={t("form.descPh")} className={field} />
         </div>
 
         <div>
-          <label className={label}>Телефон</label>
+          <label className={label}>{t("form.phone")}</label>
           <input name="phone" placeholder="+998 __ ___-__-__" className={field} />
         </div>
 
         {!editId && (
           <div>
-            <label className={label}>Фотографии (до 8)</label>
+            <label className={label}>{t("form.photos")}</label>
             <input type="file" accept="image/*" multiple onChange={onFiles} className="block w-full text-sm" />
             {photos.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
@@ -233,12 +240,12 @@ export default function NewListingForm() {
 
         <button type="submit" disabled={status === "sending"}
           className="w-full rounded-xl bg-brand p-4 text-base font-semibold text-white disabled:opacity-60">
-          {status === "sending" ? "Сохраняем…" : editId ? "Сохранить изменения" : "Опубликовать"}
+          {status === "sending" ? t("form.saving") : editId ? t("form.save") : t("form.publish")}
         </button>
 
         {!editId && (
           <p className="rounded-xl bg-amber-50 p-3 text-xs text-amber-800">
-            Объявление публикуется после проверки модератором.
+            {t("form.moderNote")}
           </p>
         )}
       </form>

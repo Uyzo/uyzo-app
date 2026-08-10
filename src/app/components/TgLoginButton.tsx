@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { t, type Lang } from "@/lib/i18n";
 
-export default function TgLoginButton() {
+export default function TgLoginButton({ lang = "ru" }: { lang?: Lang }) {
   const [state, setState] = useState<"idle" | "wait" | "err">("idle");
   const [msg, setMsg] = useState("");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -49,15 +50,13 @@ export default function TgLoginButton() {
         disabled={state === "wait"}
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#229ED9] p-4 text-base font-semibold text-white disabled:opacity-70"
       >
-        ✈️ Войти через Telegram
+        {t(lang, "login.tg")}
       </button>
       {state === "wait" && (
-        <p className="mt-2 text-center text-xs text-slate-500">
-          Открылся бот — нажмите в нём <b>«Запустить / Start»</b>. Вход подтвердится автоматически…
-        </p>
+        <p className="mt-2 text-center text-xs text-slate-500">{t(lang, "login.wait")}</p>
       )}
       {state !== "wait" && (
-        <p className="mt-2 text-center text-xs text-slate-400">Тот же аккаунт, что и в приложении. Без SMS и паролей.</p>
+        <p className="mt-2 text-center text-xs text-slate-400">{t(lang, "login.note")}</p>
       )}
       {state === "err" && <p className="mt-1 text-center text-xs text-red-600">{msg}</p>}
     </div>

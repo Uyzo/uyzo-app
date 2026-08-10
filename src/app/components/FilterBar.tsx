@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { t, type Lang } from "@/lib/i18n";
 
 const DISTRICTS = [
   "Юнусабадский", "Мирзо-Улугбекский", "Мирабадский", "Яккасарайский",
@@ -9,7 +10,7 @@ const DISTRICTS = [
   "Учтепинский", "Яшнабадский", "Бектемирский",
 ];
 
-export default function FilterBar({ realty }: { realty: boolean }) {
+export default function FilterBar({ realty, lang = "ru" }: { realty: boolean; lang?: Lang }) {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -57,14 +58,14 @@ export default function FilterBar({ realty }: { realty: boolean }) {
     <form onSubmit={apply} className="space-y-2 pb-3">
       {realty && (
         <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-white">
-          {[["", "Все"], ["owner", "Собственники"], ["agent", "Агентства"]].map(([v, t]) => (
+          {[["", "f.all"], ["owner", "f.owners"], ["agent", "f.agencies"]].map(([v, k]) => (
             <button
               key={v}
               type="button"
               onClick={() => applyOwner(v)}
               className={`flex-1 px-3 py-2 text-sm font-semibold transition ${owner === v ? "bg-brand text-white" : "text-slate-600 hover:bg-slate-50"}`}
             >
-              {t}
+              {t(lang, k)}
             </button>
           ))}
         </div>
@@ -75,12 +76,12 @@ export default function FilterBar({ realty }: { realty: boolean }) {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Поиск по объявлениям…"
+            placeholder={t(lang, "f.search")}
             className="w-full bg-transparent text-sm outline-none"
           />
         </div>
         <button type="submit" className="rounded-xl bg-brand px-5 text-sm font-semibold text-white">
-          Найти
+          {t(lang, "f.find")}
         </button>
       </div>
 
@@ -93,33 +94,33 @@ export default function FilterBar({ realty }: { realty: boolean }) {
               onClick={() => setCur(c)}
               className={`px-3 py-2 text-sm font-semibold ${cur === c ? "bg-brand text-white" : "bg-white text-slate-500"}`}
             >
-              {c === "UZS" ? "сум" : "$"}
+              {c === "UZS" ? t(lang, "u.sum") : "$"}
             </button>
           ))}
         </div>
 
         <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2 py-1">
-          <input value={pmin} onChange={(e) => setPmin(e.target.value)} type="number" placeholder="от" className="w-20 bg-transparent px-1 py-1 text-sm outline-none" />
+          <input value={pmin} onChange={(e) => setPmin(e.target.value)} type="number" placeholder={t(lang, "f.from")} className="w-20 bg-transparent px-1 py-1 text-sm outline-none" />
           <span className="text-slate-300">–</span>
-          <input value={pmax} onChange={(e) => setPmax(e.target.value)} type="number" placeholder="до" className="w-20 bg-transparent px-1 py-1 text-sm outline-none" />
+          <input value={pmax} onChange={(e) => setPmax(e.target.value)} type="number" placeholder={t(lang, "f.to")} className="w-20 bg-transparent px-1 py-1 text-sm outline-none" />
         </div>
 
         <select value={district} onChange={(e) => setDistrict(e.target.value)} className={sel}>
-          <option value="">Все районы</option>
+          <option value="">{t(lang, "f.allDistricts")}</option>
           {DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
         </select>
 
         {realty && (
           <select value={rooms} onChange={(e) => setRooms(e.target.value)} className={sel}>
-            <option value="">Комнаты</option>
+            <option value="">{t(lang, "f.rooms")}</option>
             {["1", "2", "3", "4", "5+"].map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
         )}
 
-        <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Применить</button>
+        <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">{t(lang, "f.apply")}</button>
         {hasFilters && (
           <button type="button" onClick={reset} className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-500">
-            Сбросить
+            {t(lang, "f.reset")}
           </button>
         )}
       </div>

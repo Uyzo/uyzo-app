@@ -3,19 +3,19 @@ import { notFound } from "next/navigation";
 import { type Listing } from "@/lib/supabase";
 import { getAdmin } from "@/lib/supabaseAdmin";
 import { getSession } from "@/lib/session";
-import { priceStr, INDEX_LABEL, KIND_EMOJI } from "@/lib/format";
+import { priceStr, INDEX_STYLE, indexText, KIND_EMOJI } from "@/lib/format";
+import { getT } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_NOTE: Record<string, string> = {
-  pending: "На модерации — видно только вам, пока админ не одобрит.",
-  rejected: "Объявление отклонено модератором.",
-  draft: "Черновик.",
-  archived: "В архиве.",
+const STATUS_KEY: Record<string, string> = {
+  pending: "st.pending",
+  rejected: "st.rejected",
 };
 
 export default async function ListingPage({ params }: { params: { id: string } }) {
   const admin = getAdmin();
+  const { lang, t } = getT();
   let l: Listing | null = null;
   try {
     const { data } = await admin
@@ -42,15 +42,15 @@ export default async function ListingPage({ params }: { params: { id: string } }
   }
 
   const photo = l.listing_photos?.[0]?.url;
-  const idx = l.price_index ? INDEX_LABEL[l.price_index] : null;
-  const statusNote = l.status && l.status !== "active" ? STATUS_NOTE[l.status] : null;
+  const idx = l.price_index ? INDEX_STYLE[l.price_index] : null;
+  const statusNote = l.status && STATUS_KEY[l.status] ? t(STATUS_KEY[l.status]) : null;
   const params2 =
     l.kind === "realty"
       ? [
-          ["Тип сделки", l.deal_type === "sale" ? "Продажа" : "Аренда"],
-          ["Комнаты", l.rooms ?? "—"],
-          ["Площадь", l.area ? `${l.area} м²` : "—"],
-          ["Этаж", l.floor ?? "—"],
+          [t("d.deal"), l.deal_type === "sale" ? t("d.sale") : t("d.rent")],
+          [t("d.rooms"), l.rooms ?? "—"],
+          [t("d.area"), l.area ? `${l.area} м²` : "—"],
+          [t("d.floor"), l.floor ?? "—"],
         ]
       : [];
 
@@ -58,7 +58,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
     <main className="mx-auto max-w-2xl pb-10">
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
         <Link href="/" className="text-2xl">←</Link>
-        <b className="text-sm">Объявление</b>
+        <b className="text-sm">{t("d.title")}</b>
       </div>
 
       {statusNote && (
@@ -77,13 +77,13 @@ export default async function ListingPage({ params }: { params: { id: string } }
       </div>
 
       <div className="p-4">
-        <div className="text-3xl font-extrabold">{priceStr(l)}</div>
+        <div className="text-3xl font-extrabold">{priceStr(l, lang)}</div>
         <div className="mb-3 mt-1 text-lg">{l.title}</div>
 
-        {idx && (
+        {idx && l.price_index && (
           <div className={`mb-3 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-bold ${idx.cls}`}>
-            {idx.emoji} {idx.text}
-            {l.price_market ? ` · оценка Uyzo AI ≈ ${priceStr({ price: l.price_market, currency: l.currency })}` : ""}
+            {idx.emoji} {indexText(l.price_index, lang)}
+            {l.price_market ? ` · ${t("d.aiEst")} ${priceStr({ price: l.price_market, currency: l.currency }, lang)}` : ""}
           </div>
         )}
 
@@ -99,19 +99,19 @@ export default async function ListingPage({ params }: { params: { id: string } }
         )}
 
         <div className="mb-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <h4 className="mb-2 text-sm font-semibold">Описание</h4>
+          <h4 className="mb-2 text-sm font-semibold">{t("d.desc")}</h4>
           <p className="text-sm text-slate-700">{l.description || "—"}</p>
         </div>
 
         <div className="mb-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <h4 className="mb-1 text-sm font-semibold">📍 Примерное расположение</h4>
+          <h4 className="mb-1 text-sm font-semibold">📍 {t("d.loc")}</h4>
           <p className="text-sm text-slate-600">
-            {l.districts?.name_ru ?? "Ташкент"} район · примерная зона. Точный адрес — после связи с продавцом.
+            {l.districts?.name_ru ?? t("city.tashkent")} {t("d.locNote")}
           </p>
         </div>
 
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-          ⚠️ Совет Uyzo: осматривайте товар/жильё лично, не вносите предоплату незнакомцам.
+          {t("d.safe")}
         </div>
       </div>
     </main>

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { getSupabase, type Listing } from "@/lib/supabase";
 import { getSession } from "@/lib/session";
+import { getT } from "@/lib/i18n-server";
 import ListingCard from "./components/ListingCard";
 import FilterBar from "./components/FilterBar";
 import Mascot from "./components/Mascot";
 import SubscribeButton from "./components/SubscribeButton";
+import LangSwitcher from "./components/LangSwitcher";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +14,10 @@ const RATE = 12700;
 const BOT = process.env.NEXT_PUBLIC_TG_BOT || "UyzoAppBot";
 
 const TABS = [
-  { key: "sale", label: "Купить", kind: "realty", deal: "sale" },
-  { key: "rent", label: "Снять", kind: "realty", deal: "rent" },
-  { key: "goods", label: "Объявления", kind: "goods", deal: null },
-  { key: "service", label: "Мастера", kind: "service", deal: null },
+  { key: "sale", tkey: "tab.sale", kind: "realty", deal: "sale" },
+  { key: "rent", tkey: "tab.rent", kind: "realty", deal: "rent" },
+  { key: "goods", tkey: "tab.goods", kind: "goods", deal: null },
+  { key: "service", tkey: "tab.service", kind: "service", deal: null },
 ];
 
 type SP = {
@@ -24,9 +26,10 @@ type SP = {
 };
 
 export default async function Home({ searchParams }: { searchParams: SP }) {
-  const active = TABS.find((t) => t.key === searchParams.tab) ?? TABS[0];
+  const active = TABS.find((tb) => tb.key === searchParams.tab) ?? TABS[0];
   const realty = active.kind === "realty";
   const session = getSession();
+  const { lang, t } = getT();
   const cur = searchParams.cur === "USD" ? "USD" : "UZS";
   const q = (searchParams.q ?? "").replace(/[(),]/g, " ").trim();
 
@@ -76,38 +79,39 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-base text-white">U</span>
               Uyzo
             </Link>
-            <span className="hidden text-sm text-slate-400 sm:inline">· Ташкент</span>
-            <Link href="/help" className="ml-1 rounded-lg px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100">
-              Как пользоваться
+            <span className="hidden text-sm text-slate-400 sm:inline">· {t("city.tashkent")}</span>
+            <Link href="/help" className="ml-1 hidden rounded-lg px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:inline-block">
+              {t("nav.howto")}
             </Link>
             <div className="ml-auto flex items-center gap-2">
+              <LangSwitcher lang={lang} />
               <Link href="/new" className="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark">
-                Разместить
+                {t("nav.post")}
               </Link>
               <Link
                 href={session ? "/my" : "/login"}
                 className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
-                {session ? "Кабинет" : "Войти"}
+                {session ? t("nav.cabinet") : t("nav.login")}
               </Link>
             </div>
           </div>
 
           <nav className="flex gap-1 overflow-x-auto pb-2">
-            {TABS.map((t) => (
+            {TABS.map((tb) => (
               <Link
-                key={t.key}
-                href={`/?tab=${t.key}`}
+                key={tb.key}
+                href={`/?tab=${tb.key}`}
                 className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  t.key === active.key ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+                  tb.key === active.key ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                {t.label}
+                {t(tb.tkey)}
               </Link>
             ))}
           </nav>
 
-          {active.kind !== "service" && <FilterBar realty={realty} />}
+          {active.kind !== "service" && <FilterBar realty={realty} lang={lang} />}
         </div>
       </header>
 
@@ -119,25 +123,25 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 sm:hidden">
               <div className="rounded-xl bg-white/15 p-1"><Mascot size={40} /></div>
-              <h2 className="text-lg font-extrabold">Добро пожаловать в Uyzo!</h2>
+              <h2 className="text-lg font-extrabold">{t("hero.welcome")}</h2>
             </div>
-            <h2 className="hidden text-xl font-extrabold sm:block">Найдём жильё, вещи и мастеров — рядом с вами</h2>
+            <h2 className="hidden text-xl font-extrabold sm:block">{t("hero.title")}</h2>
             <p className="mt-1 text-sm text-white/85">
-              Собственники и проверенные агентства — с честной пометкой. Фильтр «только собственники» — в один тап.
+              {t("hero.sub")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link href="/new" className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-dark">
-                ＋ Разместить бесплатно
+                {t("hero.postFree")}
               </Link>
               <a
                 href={`https://t.me/${BOT}`}
                 className="rounded-xl bg-[#229ED9] px-4 py-2 text-sm font-semibold text-white"
               >
-                ✈️ Открыть в Telegram
+                {t("hero.openTg")}
               </a>
             </div>
             <Link href="/help" className="mt-3 inline-block text-xs font-semibold text-white/85 underline underline-offset-2">
-              ❓ Как пользоваться Uyzo
+              {t("hero.howto")}
             </Link>
           </div>
         </div>
@@ -145,31 +149,29 @@ export default async function Home({ searchParams }: { searchParams: SP }) {
 
       <div className="flex items-center gap-3 px-4 py-4">
         <h1 className="text-lg font-bold text-slate-900">
-          {active.kind === "service" ? "Мастера и услуги" : active.label}
+          {active.kind === "service" ? t("sect.services") : t(active.tkey)}
         </h1>
         <span className="text-sm text-slate-400">· {listings.length}</span>
         <div className="ml-auto">
-          <SubscribeButton />
+          <SubscribeButton lang={lang} />
         </div>
       </div>
 
       {error && (
         <div className="mx-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          Не удалось загрузить объявления. Проверьте переменные окружения Supabase на Vercel.
+          {t("error.load")}
         </div>
       )}
 
       {!error && listings.length === 0 && (
         <div className="px-4 py-16 text-center text-slate-400">
-          {active.kind === "service"
-            ? "Раздел мастеров скоро наполнится."
-            : "Ничего не найдено. Попробуйте изменить фильтры или поиск."}
+          {active.kind === "service" ? t("empty.service") : t("empty.feed")}
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-3 px-4 pb-16 sm:grid-cols-3 lg:grid-cols-4">
         {listings.map((l) => (
-          <ListingCard key={l.id} l={l} />
+          <ListingCard key={l.id} l={l} lang={lang} />
         ))}
       </div>
     </div>
